@@ -1,0 +1,45 @@
+
+<html>
+<h2>Live Center Street Arrivals</h2>
+
+<p id="tracker"></p>
+<p><i>*Northbound MAX and buses only.</i></p>
+
+<script>
+function transitTracker() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange=function() {
+
+    if (this.readyState == 4 && this.status == 200) {
+	  var arrivalInfo = JSON.parse( this.responseText);
+      var nowArriving = "<table><th>Line Name</th><th>Arrival Time</th>"
+      var d = new Date();
+      for (a in arrivalInfo["resultSet"]["arrival"]){
+        lineName = arrivalInfo["resultSet"]["arrival"][a]["shortSign"];
+        arriveTime = arrivalInfo["resultSet"]["arrival"][a]["estimated"];
+     
+        //console.log(d.getTime());
+        //console.log(arriveTime);
+        seconds = (d.getTime() - arriveTime) / 1000;
+        minutes = seconds / -60;
+        mins = "ERR"
+        if (minutes.toFixed(0) == 0){
+          mins = "<i>Now</i>"
+        }
+        else {
+          mins = minutes.toFixed(0) + " min"
+        }
+        nowArriving += "<tr><td>" + lineName + " </td><td> " + mins + "  </td></tr>";
+	    
+      }
+      nowArriving += "</table>";
+      document.getElementById("tracker").innerHTML = nowArriving.toString();
+    }
+  };
+  xhttp.open("GET", "https://developer.trimet.org/ws/v2/arrivals?locIDs=6849,13724&appID=43B66D36EC040BB6A6D218B98", true);
+  xhttp.send();
+}
+transitTracker();
+setInterval(transitTracker, 15000); //refresh every 15 secs
+</script>
+</html>
